@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sơ đồ quy trình trình ký văn bản — Phần mềm ĐHTN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#B01228; --red-soft:#f3dfe2; --ink:#1c1a17; --ink-2:#55504a;
+  --paper:#faf6ef; --card:#ffffff; --line:#e7e0d4; --gold:#9a7b2e; --gold-soft:#f1e7cf;
+  --ok:#1f7a4d; --ok-soft:#e6f2eb; --warn:#b8541b; --warn-soft:#fbeee4;
+  --shadow:0 1px 2px rgba(28,26,23,.06), 0 8px 24px -12px rgba(28,26,23,.18);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Be Vietnam Pro","Segoe UI",Tahoma,Arial,sans-serif;
+  background:var(--paper);color:var(--ink);line-height:1.5;font-size:16px;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px 64px}
+body.view-table .wrap{max-width:1060px}
+
+/* ===== Header ===== */
+header.top{position:sticky;top:0;z-index:50;
+  background:linear-gradient(180deg,var(--paper) 72%,rgba(250,246,239,0));
+  padding-top:env(safe-area-inset-top)}
+.brand{display:flex;align-items:center;gap:10px;padding:16px 14px 10px;max-width:1060px;margin:0 auto}
+.brand .star{width:34px;height:34px;flex:none;border-radius:8px;background:var(--red);
+  color:#fff;display:grid;place-items:center;font-size:18px;box-shadow:var(--shadow)}
+.brand h1{font-size:18px;font-weight:700;margin:0;letter-spacing:.2px;line-height:1.25}
+.brand p{margin:0;font-size:11.5px;color:var(--ink-2);font-weight:500}
+
+.tabs{display:flex;gap:6px;padding:4px 14px 8px;max-width:1060px;margin:0 auto;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1.5px solid var(--line);background:var(--card);color:var(--ink-2);
+  border-radius:11px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:600;
+  cursor:pointer;text-align:left;line-height:1.25}
+.tab b{display:block;font-size:13px;font-weight:700;color:var(--ink)}
+.tab small{font-size:10.5px;font-weight:500;color:var(--ink-2)}
+.tab.active{background:var(--red);border-color:var(--red)}
+.tab.active b,.tab.active small{color:#fff}
+
+.toolbar{display:flex;align-items:center;gap:8px;padding:0 14px 12px;max-width:1060px;margin:0 auto;flex-wrap:wrap}
+.seg{display:flex;border:1.5px solid var(--line);background:var(--card);border-radius:11px;overflow:hidden}
+.seg button{border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:600;
+  color:var(--ink-2);padding:7px 12px;cursor:pointer}
+.seg button.on{background:var(--ink);color:#fff}
+.btn{border:1.5px solid var(--line);background:var(--card);border-radius:11px;font:inherit;
+  font-size:12.5px;font-weight:600;color:var(--ink-2);padding:7px 12px;cursor:pointer}
+.btn:hover{border-color:var(--gold);color:var(--ink)}
+.hint{font-size:11px;color:var(--ink-2)}
+
+/* ===== Section ===== */
+.pl{display:none}
+.pl.active{display:block}
+.pltitle{margin:6px 2px 2px;font-size:13px;font-weight:800;letter-spacing:1.6px;
+  text-transform:uppercase;color:var(--gold)}
+.plsub{margin:0 2px 12px;font-size:15.5px;font-weight:700;line-height:1.4}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:0 2px 12px;font-size:12.5px;color:var(--ink);font-weight:500}
+.legend span{display:inline-flex;align-items:center;gap:7px;background:var(--card);
+  border:1.5px solid var(--line);border-radius:999px;padding:5px 11px}
+.lg{display:inline-block;width:22px;height:3px;border-radius:2px;background:var(--ink)}
+.lg.back{background:var(--warn)}
+.lg.add{width:11px;height:11px;border-radius:3px;background:var(--gold)}
+
+/* ===== Card view ===== */
+/* Đường hồi "không Đạt trả lại" được vẽ dọc bên trái chồng thẻ, chạy ngược
+   về Bước 1 — cùng ý nghĩa với ray hồi trong Bảng sơ đồ. */
+.cards{display:block;position:relative;padding-left:36px}
+.step{background:var(--card);border:1.5px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);padding:13px 15px;margin-bottom:0;position:relative}
+/* Một đường liền duy nhất cho cả dải bước có nhánh "không Đạt trả lại":
+   .crailzone bao từ Bước 1 đến bước cuối còn nhánh này, nên ray không bị cắt khúc.
+   Ray bắt đầu ngang tầm số hiệu Bước 1 (top:30px) và mũi tên trỏ vào đó. */
+.crailzone{position:relative}
+.crail{position:absolute;left:-20px;top:30px;bottom:0;width:1.5px;background:var(--warn)}
+.crail::after{content:'';position:absolute;left:0;top:0;width:20px;height:1.5px;background:var(--warn)}
+.crail::before{content:'';position:absolute;left:20px;top:-3px;
+  border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:6px solid var(--warn)}
+.cbacklbl{position:absolute;left:-36px;top:46px;writing-mode:vertical-rl;
+  font-size:9.5px;line-height:1;color:var(--warn);font-weight:600}
+.step.added{border-color:var(--gold);background:#fffdf7}
+.shead{display:flex;gap:10px;align-items:flex-start}
+.num{flex:none;width:26px;height:26px;border-radius:8px;background:var(--red);color:#fff;
+  display:grid;place-items:center;font-size:13px;font-weight:700}
+.step.added .num{background:var(--gold)}
+.stitle{flex:1;min-width:0}
+.task{font-size:14.5px;font-weight:700;line-height:1.35}
+.role{font-size:12.5px;color:var(--ink-2);margin-top:2px}
+.sdesc{font-size:13.5px;line-height:1.5;margin-top:9px}
+.scond{margin-top:8px;background:var(--warn-soft);border:1px solid #f0d9c6;border-radius:9px;
+  padding:8px 11px;font-size:13px;line-height:1.45;color:#7d3a12}
+.arrowdown{display:grid;place-items:center;height:26px;color:var(--ink-2);position:relative}
+
+/* ===== Sheet (table/diagram) view ===== */
+/* Màn hẹp: bảng không bị bóp nát mà cuộn ngang trong khung riêng,
+   trang vẫn không bao giờ cuộn ngang theo. */
+.sheetwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.sheet{display:grid;grid-template-columns:52px 168px 250px minmax(170px,1fr);min-width:640px;
+  background:var(--card);border:1.5px solid var(--ink);border-radius:6px;overflow:hidden;
+  box-shadow:var(--shadow)}
+.sheet .h{background:#f2ece1;font-size:12.5px;font-weight:700;text-align:center;
+  padding:10px 8px;border-bottom:1.5px solid var(--ink);border-right:1px solid var(--ink)}
+.sheet .h:last-child{border-right:0}
+.sheet .c{border-right:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:12px 10px;
+  font-size:12.5px;line-height:1.45}
+.sheet .c.last{border-right:0}
+.sheet .c.r-1{border-bottom:0}
+.sheet .c.stt{text-align:center;font-weight:700}
+.sheet .c.role{text-align:center}
+.sheet .c.desc{font-size:12px}
+.sheet .cond{color:#7d3a12}
+.sheet .c.row-add{background:#fffdf7}
+
+/* .sheet .c đặt padding chung nên phải cùng độ ưu tiên (2 class) mới ghi đè được */
+.sheet .c.flow{position:relative;padding:16px 8px 16px 50px;display:flex;align-items:center;
+  justify-content:flex-start;min-height:104px}
+.nw{position:relative;display:flex;justify-content:center;width:186px;max-width:100%}
+.node{background:var(--card);border:1.5px solid var(--ink);padding:8px 10px;
+  font-size:12px;line-height:1.35;text-align:center;max-width:100%}
+.node.start,.node.end{border-radius:16px}
+.node.proc{border-radius:4px}
+.node.end{border-color:var(--gold);background:#fdf7e8}
+.dia{position:relative;width:100%;max-width:186px;height:74px;display:grid;place-items:center}
+.dia i{position:absolute;inset:0;background:var(--ink);
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.dia i+i{inset:2px;background:var(--card)}
+.dia span{position:relative;z-index:2;font-size:12.5px;font-weight:600}
+.cd{position:absolute;left:50%;transform:translateX(-50%);bottom:-32px;width:1.5px;height:32px;background:var(--ink);z-index:1}
+.cd::after{content:'';position:absolute;left:50%;transform:translateX(-50%);bottom:0;
+  border-left:4px solid transparent;border-right:4px solid transparent;border-top:6px solid var(--ink)}
+/* bottom:-1px để ray phủ qua đường viền ngang giữa hai ô, tránh đứt đoạn */
+.rail{position:absolute;left:22px;top:0;bottom:-1px;width:1.5px;background:var(--warn)}
+.railend{position:absolute;left:22px;top:50%;bottom:-1px;width:1.5px;background:var(--warn)}
+/* đoạn ngang nối ray hồi vào cạnh trái hộp Bước 1 */
+.inarrow{position:absolute;right:100%;top:50%;width:28px;height:1.5px;background:var(--warn)}
+.inarrow::after{content:'';position:absolute;right:-1px;top:-3px;
+  border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:6px solid var(--warn)}
+.backlbl{position:absolute;left:27px;top:10px;writing-mode:vertical-rl;
+  font-size:9.5px;line-height:1;color:var(--warn);font-weight:600;letter-spacing:.2px}
+
+/* ===== Blocks below diagram ===== */
+.block{background:var(--card);border:1.5px solid var(--line);border-radius:14px;
+  padding:13px 15px;margin-top:14px;box-shadow:var(--shadow)}
+.block h3{margin:0 0 8px;font-size:12.5px;font-weight:800;letter-spacing:1.2px;
+  text-transform:uppercase;color:var(--gold)}
+.block p{margin:0;font-size:13.5px;line-height:1.55}
+.block ol{margin:0;padding-left:20px;font-size:13.5px;line-height:1.6}
+.block ol li{margin-bottom:5px}
+.note{margin-top:10px;font-size:12.5px;color:var(--ink-2);background:var(--gold-soft);
+  border-radius:9px;padding:9px 11px;line-height:1.5}
+.note b{color:var(--ink)}
+.note.warn{background:var(--warn-soft);color:#7d3a12}
+.note.warn b{color:#7d3a12}
+.footer{text-align:center;font-size:11.5px;color:var(--ink-2);margin-top:26px;line-height:1.7}
+
+body.view-card .sheetwrap{display:none}
+body.view-table .cards{display:none}
+@media (max-width:820px){
+  body.view-table .wrap{padding:0 8px 64px}
+}
+
+/* ===== Print ===== */
+@media print{
+  @page{size:A4 portrait;margin:12mm}
+  body{background:#fff;font-size:11px;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  header.top,.toolbar,.tabs{display:none!important}
+  .wrap{max-width:none!important;padding:0!important}
+  .cards{display:none!important}
+  .pl{display:block!important;break-after:page}
+  .pl:last-of-type{break-after:auto}
+  .sheetwrap{display:block!important;overflow:visible!important}
+  .sheet{display:grid!important;box-shadow:none;border-radius:0;min-width:0;
+    grid-template-columns:40px 130px 200px minmax(0,1fr)}
+  .sheet .c,.sheet .h{padding:4px 5px;font-size:9px;line-height:1.35;break-inside:avoid}
+  .sheet .c.desc{font-size:8.5px}
+  .block{box-shadow:none;border-radius:0;padding:6px 0 0;border:0;border-top:1px solid var(--line);
+    margin-top:8px;break-inside:avoid}
+  .block h3{margin-bottom:4px;font-size:9.5px}
+  .block ol,.block p{font-size:9px;line-height:1.4}
+  .block ol li{margin-bottom:2px}
+  .block ol{padding-left:16px}
+  .note{margin-top:6px;padding:5px 7px;font-size:8.5px;line-height:1.4}
+  .pltitle{margin:0 0 1px;font-size:10px}
+  .plsub{font-size:11.5px;margin-bottom:6px}
+  .legend{margin-bottom:6px;font-size:8.5px;gap:12px}
+  .legend span{background:none;border:0;padding:0;gap:5px}
+  .lg{width:16px;height:2px}
+  .lg.add{width:8px;height:8px}
+  .node,.dia span{font-size:8.5px}
+  .node{padding:5px 7px}
+  .dia{height:44px;max-width:140px}
+  .sheet .c.flow{min-height:62px;padding:8px 5px 8px 38px}
+  .nw{width:140px}
+  .cd{bottom:-16px;height:16px}
+  .rail,.railend{left:16px}
+  .inarrow{width:22px}
+  /* cỡ chữ in quá nhỏ để đọc nhãn dọc — chú giải phía trên đã nêu đủ */
+  .backlbl{display:none}
+}
+</style>
+</head>
+<body class="view-card">
+
+<header class="top">
+  <div class="brand">
+    <div class="star">★</div>
+    <div>
+      <h1>Sơ đồ quy trình trình ký văn bản</h1>
+      <p>Phần mềm ĐHTN — Học viện Chính trị quốc gia</p>
+    </div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="toolbar">
+    <div class="seg">
+      <button type="button" data-view="card">▤ Thẻ bước</button>
+      <button type="button" data-view="table">▦ Bảng sơ đồ</button>
+    </div>
+    <button class="btn" type="button" id="print">⎙ In / PDF</button>
+    <span class="hint">In ra đủ cả 4 phụ lục</span>
+  </div>
+</header>
+
+<main class="wrap" id="main"></main>
+
+<script>
+/* Nội dung 4 phụ lục chép nguyên văn từ file:
+   "SƠ ĐỒ MÔ TẢ QUY TRÌNH TRÌNH KÝ VĂN BẢN TRÊN PHẦN MỀM ĐHTN.docx"
+   Không sửa chính tả, không chuẩn hoá câu chữ.
+   Bước có add:1 là phần BỔ SUNG theo yêu cầu (bước Lưu trữ), nối vào cuối
+   để số thứ tự các bước gốc giữ nguyên. */
+
+const LUUTRU = {
+  role:'Văn thư – Lưu trữ', task:'Lưu trữ',
+  d:'Thực hiện theo Quy chế công tác văn thư và công tác lưu trữ của Học viện CTQG',
+  c:'', shape:'end', add:1
+};
+const VANTHU_TASK = 'Kiểm tra lần cuối thể thức văn bản, cấp số, đóng dấu, phát hành và lưu văn bản theo quy định';
+const VANTHU_DESC = 'Thực hiện theo Quy chế công tác văn thư và công tác lưu trữ của Học viện CTQG';
+
+const PL = [
+{
+  id:'pl1', tab:'Phụ lục 1', hint:'Giám đốc trực tiếp ký duyệt',
+  title:'PHỤ LỤC 1',
+  sub:'Sơ đồ mô tả quy trình trình ký: Trường hợp Giám đốc phụ trách và trực tiếp ký duyệt văn bản',
+  steps:[
+    {role:'Chuyên viên/người được giao nhiệm vụ', task:'Thu nhập thông tin và soạn thảo',
+     d:'Soạn thảo văn bản theo quy định', c:'', shape:'start'},
+    {role:'Cấp Phó đơn vị (phụ trách)', task:'Phê duyệt',
+     d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản.',
+     c:'(Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+    {role:'Cấp Trưởng đơn vị', task:'Phê duyệt',
+     d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản ký nháy',
+     c:'(Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+    {role:'Văn phòng', task:'Kiểm soát',
+     d:'Tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản.',
+     c:'(Nếu văn bản Đạt chuyển đến Giám đốc ký duyệt, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+    {role:'Giám đốc', task:'Ký duyệt',
+     d:'Giám đốc ký duyệt văn bản',
+     c:'(Nếu văn bản Đạt Giám đốc ký duyệt văn bản, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+    {role:'Văn thư', task:VANTHU_TASK, d:VANTHU_DESC,
+     c:'(Nếu văn bản Đạt văn thư phát hành, không Đạt trả lại chuyên viên soạn thảo)', shape:'proc'},
+    LUUTRU
+  ],
+  deadline:'Tại Bước 2,3: Không quá ½  ngày làm việc, tại Bước 4,6 không quá 3 giờ làm việc. tại Bước 5 không quá 1 ngày làm việc',
+  warn:'',
+  explain:[
+    'Chuyên viên soạn thảo trình ký văn bản.',
+    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại chuyên viên soạn thảo).',
+    'Cấp Trưởng đơn vị cho ý kiến, chuyển phê duyệt (Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại chuyên viên soạn thảo).',
+    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản Đạt chuyển đến Giám đốc ký duyệt, không Đạt trả lại chuyên viên soạn thảo).',
+    'Giám đốc ký duyệt. (Nếu văn bản Đạt ký duyệt, không Đạt trả lại chuyên viên soạn thảo).',
+    'Văn thư kiểm tra thể thức văn bản lần cuối trước khi ban hành (Nếu văn bản Đạt cấp số, đóng dấu, lưu văn bản, không Đạt trả lại chuyên viên soạn thảo).'
+  ]
+},
+{
+  id:'pl2', tab:'Phụ lục 2', hint:'Phó Giám đốc trình Giám đốc ký',
+  title:'PHỤ LỤC 2',
+  sub:'Sơ đồ mô tả quy trình trình ký: Trường hợp Phó Giám đốc được phân công phụ trách nhưng trình Giám đốc ký duyệt văn bản',
+  steps:[
+    {role:'Chuyên viên/người được giao nhiệm vụ', task:'Thu nhập thông tin và soạn thảo',
+     d:'Soạn thảo văn bản theo quy định', c:'', shape:'start'},
+    {role:'Cấp Phó đơn vị (phụ trách)', task:'Phê duyệt',
+     d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản.',
+     c:'(Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+    {role:'Cấp Trưởng đơn vị', task:'Phê duyệt',
+     d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản ký nháy',
+     c:'(Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+    {role:'Văn phòng', task:'Kiểm soát',
+     d:'Tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản.',
+     c:'(Nếu văn bản Đạt chuyển đến Giám đốc ký duyệt, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+    {role:'Phó Giám đốc', task:'Phê duyệt',
+     d:'Phó Giám đốc phê duyệt văn bản chuyển Giám đốc',
+     c:'(Nếu văn bản Đạt Phó Giám đốc  phê duyệt, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+    {role:'Giám đốc', task:'Ký duyệt',
+     d:'Giám đốc ký duyệt văn bản',
+     c:'(Nếu văn bản Đạt Giám đốc ký duyệt, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+    {role:'Văn thư Học viện', task:VANTHU_TASK, d:VANTHU_DESC,
+     c:'(Nếu văn bản Đạt văn thư phát hành, không Đạt trả lại chuyên viên soạn thảo)', shape:'proc'},
+    LUUTRU
+  ],
+  deadline:'Tại Bước 2,3,5: Không quá ½  ngày làm việc, tại Bước 4,6 không quá 3 giờ làm việc. tại Bước 5 không quá 1 ngày làm việc',
+  warn:'Bản gốc ghi Bước 5 vừa “không quá ½ ngày làm việc” vừa “không quá 1 ngày làm việc”; Bước 7 (Văn thư Học viện) không được nêu thời hạn. Nội dung trên giữ nguyên văn — cần đối chiếu bản gốc có dấu khi áp dụng.',
+  explain:[
+    'Chuyên viên soạn thảo trình ký văn bản.',
+    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại).',
+    'Cấp Trưởng đơn vị cho ý kiến, chuyển phê duyệt (Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại chuyên viên soạn thảo).',
+    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản Đạt chuyển đến Phó Giám đốc phê duyệt, không Đạt trả lại).',
+    'Phó Giám đốc phê duyệt. (Nếu văn bản Đạt Phó Giám đốc phê duyệt, không Đạt trả lại).',
+    'Giám đốc ký duyệt. (Nếu văn bản Đạt ký duyệt, không Đạt trả lại).',
+    'Văn thư kiểm tra thể thức lần cuối trước khi ban hành (Nếu văn bản Đạt cấp số, đóng dấu, lưu văn bản, không Đạt trả lại).'
+  ]
+},
+{
+  id:'pl3', tab:'Phụ lục 3', hint:'Phó Giám đốc trực tiếp ký duyệt',
+  title:'PHỤ LỤC 3',
+  sub:'Sơ đồ mô tả quy trình trình ký: Trường hợp Phó Giám đốc được phân công phụ trách trực tiếp ký duyệt văn bản',
+  steps:[
+    {role:'Chuyên viên/người được giao nhiệm vụ', task:'Thu nhập thông tin và soạn thảo',
+     d:'Soạn thảo văn bản theo quy định', c:'', shape:'start'},
+    {role:'Cấp Phó đơn vị (phụ trách)', task:'Phê duyệt',
+     d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản.',
+     c:'(Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại', shape:'dia'},
+    {role:'Cấp Trưởng đơn vị', task:'Phê duyệt',
+     d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản ký nháy',
+     c:'(Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại)', shape:'dia'},
+    {role:'Văn phòng', task:'Kiểm soát',
+     d:'Tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản.',
+     c:'(Nếu văn bản Đạt chuyển đến Phó Giám đốc ký duyệt, không Đạt trả lại)', shape:'dia'},
+    {role:'Phó Giám đốc', task:'Ký duyệt',
+     d:'Phó Giám đốc ký duyệt văn bản',
+     c:'(Nếu văn bản Đạt Phó Giám đốc ký duyệt văn bản, không Đạt trả lại)', shape:'dia'},
+    {role:'Văn thư', task:VANTHU_TASK, d:VANTHU_DESC,
+     c:'(Nếu văn bản Đạt văn thư phát hành, không Đạt trả lại)', shape:'proc'},
+    LUUTRU
+  ],
+  deadline:'Tại Bước 2,3: Không quá ½  ngày làm việc, tại Bước 4,6 không quá 3 giờ làm việc. tại Bước 5 không quá 1 ngày làm việc',
+  warn:'Bản gốc thiếu dấu đóng ngoặc ở cuối ô Mô tả công việc của Bước 2 — giữ nguyên văn.',
+  explain:[
+    'Chuyên viên soạn thảo trình ký văn bản.',
+    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại).',
+    'Cấp Trưởng đơn vị cho ý kiến, chuyển phê duyệt (Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại).',
+    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản Đạt chuyển đến Phó Giám đốc ký duyệt, không Đạt trả lại).',
+    'Phó Giám đốc ký duyệt. (Nếu văn bản Đạt ký duyệt, không Đạt trả lại).',
+    'Văn thư kiểm tra thể thức lần cuối trước khi ban hành (Nếu văn bản Đạt cấp số, đóng dấu, lưu văn bản, không Đạt trả lại).'
+  ]
+},
+{
+  id:'pl4', tab:'Phụ lục 4', hint:'Trưởng đơn vị ký thừa lệnh',
+  title:'PHỤ LỤC 4',
+  sub:'Sơ đồ mô tả quy trình trình ký: Trường hợp Trưởng đơn vị được Giám đốc Ủy quyền ký duyệt văn bản (Ký thừa lệnh)',
+  steps:[
+    {role:'Chuyên viên/người được giao nhiệm vụ', task:'Thu nhập thông tin và soạn thảo',
+     d:'Soạn thảo văn bản theo quy định', c:'', shape:'start'},
+    {role:'Cấp Phó đơn vị (phụ trách)', task:'Phê duyệt',
+     d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản.',
+     c:'(Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại)', shape:'dia'},
+    {role:'Văn phòng', task:'Kiểm soát',
+     d:'Tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản.',
+     c:'(Nếu văn bản Đạt chuyển đến Trưởng đơn vị ký duyệt, không Đạt trả lại)', shape:'dia'},
+    {role:'Cấp Trưởng đơn vị', task:'Ký duyệt',
+     d:'Ký duyệt văn bản', c:'(Nếu văn bản Đạt ký duyệt, không Đạt trả lại)', shape:'dia'},
+    {role:'Văn thư', task:VANTHU_TASK, d:VANTHU_DESC,
+     c:'(Nếu văn bản Đạt văn thư phát hành, không Đạt trả lại)', shape:'proc'},
+    LUUTRU
+  ],
+  deadline:'Tại Bước 2,3: Không quá ½  ngày làm việc, tại Bước 4 không quá 3 giờ làm việc. tại Bước 4 không quá 1 ngày làm việc',
+  warn:'Bản gốc nêu Bước 4 hai lần với hai mốc khác nhau (“không quá 3 giờ làm việc” và “không quá 1 ngày làm việc”); Bước 5 (Văn thư) không được nêu thời hạn. Nội dung trên giữ nguyên văn — cần đối chiếu bản gốc có dấu khi áp dụng.',
+  explain:[
+    'Chuyên viên soạn thảo trình ký văn bản.',
+    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại chuyên viên soạn thảo nêu rõ lý do).',
+    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản Đạt chuyển đến (Ký thừa lệnh), không Đạt trả lại chuyên viên soạn thảo).',
+    'Trưởng đơn vị ký duyệt. (Nếu văn bản Đạt ký duyệt, không Đạt trả lại chuyên viên soạn thảo).',
+    'Văn thư kiểm tra thể thức văn bản lần cuối trước khi ban hành (Nếu văn bản Đạt cấp số, đóng dấu, lưu văn bản, không Đạt trả lại chuyên viên soạn thảo).'
+  ]
+}
+];
+
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function node(st){
+  if(st.shape==='dia') return '<div class="dia"><i></i><i></i><span>'+esc(st.task)+'</span></div>';
+  const cls = st.shape==='start' ? 'start' : (st.shape==='end' ? 'end' : 'proc');
+  return '<div class="node '+cls+'">'+esc(st.task)+'</div>';
+}
+
+function sheet(pl){
+  let h='<div class="sheet">'
+    +'<div class="h">Stt</div><div class="h">Trách nhiệm</div>'
+    +'<div class="h">Trình tự công việc</div><div class="h">Mô tả công việc/<br>Biểu mẫu</div>';
+  const n=pl.steps.length;
+  pl.steps.forEach((st,i)=>{
+    const last = i===n-1;
+    const rowcls = (last?' r-1':'') + (st.add?' row-add':'');
+    // đường hồi "không Đạt trả lại": chạy từ các bước có điều kiện ngược về Bước 1
+    let rail='';
+    if(i===0) rail='<i class="railend"></i>';
+    else if(!last && st.c) rail='<i class="rail"></i>'+(i===1?'<span class="backlbl">không Đạt trả lại</span>':'');
+    else if(!last) rail='<i class="rail"></i>';
+    h+='<div class="c stt'+rowcls+'">'+(i+1)+'</div>'
+      +'<div class="c role'+rowcls+'">'+esc(st.role)+'</div>'
+      +'<div class="c flow'+rowcls+'">'+rail
+      +'<div class="nw">'+(i===0?'<i class="inarrow"></i>':'')
+      +node(st)+(last?'':'<i class="cd"></i>')+'</div></div>'
+      +'<div class="c desc last'+rowcls+'">'+esc(st.d)
+      +(st.c?'<br><span class="cond">'+esc(st.c)+'</span>':'')+'</div>';
+  });
+  return h+'</div>';
+}
+
+function cards(pl){
+  const n=pl.steps.length;
+  // bước cuối cùng còn nhánh "không Đạt trả lại" — đường hồi chạy từ đây ngược về Bước 1
+  let lastCond=-1;
+  pl.steps.forEach((st,i)=>{ if(st.c) lastCond=i; });
+  let h='<div class="cards">';
+  pl.steps.forEach((st,i)=>{
+    if(i===0) h+='<div class="crailzone"><i class="crail"></i>'
+      +'<span class="cbacklbl">không Đạt trả lại</span>';
+    h+='<div class="step'+(st.add?' added':'')+'">'
+      +'<div class="shead"><div class="num">'+(i+1)+'</div>'
+      +'<div class="stitle"><div class="task">'+esc(st.task)+'</div>'
+      +'<div class="role">'+esc(st.role)+'</div></div></div>'
+      +'<div class="sdesc">'+esc(st.d)+'</div>'
+      +(st.c?'<div class="scond">'+esc(st.c)+'</div>':'')
+      +'</div>';
+    if(i===lastCond) h+='</div>';
+    if(i<n-1) h+='<div class="arrowdown">'
+      +'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M6 13l6 6 6-6"/></svg></div>';
+  });
+  return h+'</div>';
+}
+
+function section(pl){
+  return '<section class="pl" id="'+pl.id+'">'
+    +'<div class="pltitle">'+esc(pl.title)+'</div>'
+    +'<div class="plsub">'+esc(pl.sub)+'</div>'
+    +'<div class="legend">'
+      +'<span><i class="lg"></i>Luồng xử lý</span>'
+      +'<span><i class="lg back"></i>không Đạt trả lại</span>'
+      +'<span><i class="lg add"></i>Bước bổ sung</span>'
+    +'</div>'
+    +'<div class="sheetwrap">'+sheet(pl)+'</div>' + cards(pl)
+    +'<div class="block"><h3>Thời hạn xử lý</h3><p>'+esc(pl.deadline)+'</p>'
+      +(pl.warn?'<div class="note warn"><b>Lưu ý:</b> '+esc(pl.warn)+'</div>':'')+'</div>'
+    +'<div class="block"><h3>Diễn giải các bước '+esc(pl.title.toLowerCase())+'</h3><ol>'
+      + pl.explain.map(x=>'<li>'+esc(x)+'</li>').join('')
+    +'</ol>'
+      +'<div class="note"><b>Bổ sung:</b> Bước '+pl.steps.length
+      +' — Văn thư – Lưu trữ thực hiện lưu trữ văn bản. Bước này được bổ sung so với bản gốc; '
+      +'các bước 1–'+(pl.steps.length-1)+' giữ nguyên số thứ tự và nguyên văn nội dung.</div>'
+    +'</div>'
+    +'</section>';
+}
+
+const main=document.getElementById('main');
+main.innerHTML = PL.map(section).join('')
+  +'<div class="footer">Nguồn nội dung: <b>SƠ ĐỒ MÔ TẢ QUY TRÌNH TRÌNH KÝ VĂN BẢN TRÊN PHẦN MỀM ĐHTN</b>.<br>'
+  +'Nội dung 4 phụ lục chép nguyên văn theo bản gốc; bước Lưu trữ là phần bổ sung.<br>'
+  +'Khi áp dụng chính thức cần đối chiếu nguyên văn bản gốc có dấu.</div>';
+
+/* Tabs */
+const tabsEl=document.getElementById('tabs');
+tabsEl.innerHTML = PL.map((p,i)=>'<button class="tab'+(i?'':' active')+'" data-id="'+p.id+'">'
+  +'<b>'+p.tab+'</b><small>'+p.hint+'</small></button>').join('');
+function showPL(id){
+  document.querySelectorAll('.pl').forEach(s=>s.classList.toggle('active',s.id===id));
+  tabsEl.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
+}
+tabsEl.addEventListener('click',e=>{
+  const b=e.target.closest('.tab'); if(b) showPL(b.dataset.id);
+});
+showPL(PL[0].id);
+
+/* Chế độ xem do script tự chọn theo bề ngang màn hình: từ 900px trở lên dùng
+   Bảng sơ đồ, hẹp hơn dùng Thẻ bước; tự đổi lại khi thay đổi cỡ cửa sổ hoặc xoay máy.
+   Hai nút chỉ để ghi đè thủ công; nút đang sáng luôn là chế độ đang hiển thị. */
+const TABLE_MIN=900;
+const seg=document.querySelector('.seg');
+let pinned=null;
+try{ const s=localStorage.getItem('sdtk-view'); if(s==='card'||s==='table') pinned=s; }catch(e){}
+
+function apply(){
+  const v = pinned || (window.innerWidth>=TABLE_MIN ? 'table' : 'card');
+  document.body.classList.toggle('view-card',v==='card');
+  document.body.classList.toggle('view-table',v==='table');
+  seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.view===v));
+}
+seg.addEventListener('click',e=>{
+  const b=e.target.closest('button[data-view]'); if(!b) return;
+  pinned=b.dataset.view;
+  try{localStorage.setItem('sdtk-view',pinned)}catch(e){}
+  apply();
+});
+let rz;
+window.addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(apply,120); });
+apply();
+document.getElementById('print').addEventListener('click',()=>window.print());
+</script>
+
+</body>
+</html>
