@@ -25,9 +25,12 @@ body{
 body.view-table .wrap{max-width:1060px}
 
 /* ===== Header ===== */
-header.top{position:sticky;top:0;z-index:50;
-  background:linear-gradient(180deg,var(--paper) 72%,rgba(250,246,239,0));
+/* Nền đục hẳn: header có 3 hàng (tên, tab, thanh công cụ) nên nếu để gradient mờ
+   như các repo chỉ có ô tìm kiếm thì nội dung cuộn xuyên qua thanh công cụ. */
+header.top{position:sticky;top:0;z-index:50;background:var(--paper);
   padding-top:env(safe-area-inset-top)}
+header.top::after{content:'';position:absolute;left:0;right:0;top:100%;height:10px;
+  background:linear-gradient(180deg,var(--paper),rgba(250,246,239,0));pointer-events:none}
 .brand{display:flex;align-items:center;gap:10px;padding:16px 14px 10px;max-width:1060px;margin:0 auto}
 .brand .star{width:34px;height:34px;flex:none;border-radius:8px;background:var(--red);
   color:#fff;display:grid;place-items:center;font-size:18px;box-shadow:var(--shadow)}
@@ -60,7 +63,11 @@ header.top{position:sticky;top:0;z-index:50;
 .pltitle{margin:6px 2px 2px;font-size:13px;font-weight:800;letter-spacing:1.6px;
   text-transform:uppercase;color:var(--gold)}
 .plsub{margin:0 2px 12px;font-size:15.5px;font-weight:700;line-height:1.4}
-.legend{display:flex;gap:8px;flex-wrap:wrap;margin:0 2px 12px;font-size:12.5px;color:var(--ink);font-weight:500}
+/* Chú giải dính ngay dưới header khi cuộn, để mã màu đường kẻ luôn đọc được.
+   --hh là chiều cao header, do script đo lại mỗi khi đổi cỡ màn hình. */
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--ink);font-weight:500;
+  position:sticky;top:var(--hh,150px);z-index:20;background:var(--paper);
+  margin:0 2px 12px;padding:4px 0 8px}
 .legend span{display:inline-flex;align-items:center;gap:7px;background:var(--card);
   border:1.5px solid var(--line);border-radius:999px;padding:5px 11px}
 .lg{display:inline-block;width:22px;height:3px;border-radius:2px;background:var(--ink)}
@@ -68,12 +75,12 @@ header.top{position:sticky;top:0;z-index:50;
 .lg.add{width:11px;height:11px;border-radius:3px;background:var(--gold)}
 
 /* ===== Card view ===== */
-/* Đường hồi "không Đạt trả lại" được vẽ dọc bên trái chồng thẻ, chạy ngược
+/* Đường hồi "không đạt trả lại" được vẽ dọc bên trái chồng thẻ, chạy ngược
    về Bước 1 — cùng ý nghĩa với ray hồi trong Bảng sơ đồ. */
 .cards{display:block;position:relative;padding-left:36px}
 .step{background:var(--card);border:1.5px solid var(--line);border-radius:14px;
   box-shadow:var(--shadow);padding:13px 15px;margin-bottom:0;position:relative}
-/* Một đường liền duy nhất cho cả dải bước có nhánh "không Đạt trả lại":
+/* Một đường liền duy nhất cho cả dải bước có nhánh "không đạt trả lại":
    .crailzone bao từ Bước 1 đến bước cuối còn nhánh này, nên ray không bị cắt khúc.
    Ray bắt đầu ngang tầm số hiệu Bước 1 (top:30px) và mũi tên trỏ vào đó. */
 .crailzone{position:relative}
@@ -81,8 +88,10 @@ header.top{position:sticky;top:0;z-index:50;
 .crail::after{content:'';position:absolute;left:0;top:0;width:20px;height:1.5px;background:var(--warn)}
 .crail::before{content:'';position:absolute;left:20px;top:-3px;
   border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:6px solid var(--warn)}
-.cbacklbl{position:absolute;left:-36px;top:46px;writing-mode:vertical-rl;
-  font-size:9.5px;line-height:1;color:var(--warn);font-weight:600}
+/* Nhãn dọc trượt theo màn hình trong phạm vi ray, luôn nằm cạnh đường kẻ đang nhìn */
+.cbacklbl-track{position:absolute;left:-36px;top:46px;bottom:10px;width:13px;pointer-events:none}
+.cbacklbl{position:sticky;top:calc(var(--hh,150px) + var(--lh,44px) + 10px);display:block;
+  writing-mode:vertical-rl;font-size:9.5px;line-height:1;color:var(--warn);font-weight:600}
 .step.added{border-color:var(--gold);background:#fffdf7}
 .shead{display:flex;gap:10px;align-items:flex-start}
 .num{flex:none;width:26px;height:26px;border-radius:8px;background:var(--red);color:#fff;
@@ -163,6 +172,22 @@ body.view-table .cards{display:none}
 @media (max-width:820px){
   body.view-table .wrap{padding:0 8px 64px}
 }
+/* Màn hẹp: header 3 hàng chiếm quá nhiều chiều cao, thu gọn lại */
+@media (max-width:430px){
+  .brand{padding:12px 14px 8px;gap:9px}
+  .brand .star{width:30px;height:30px;font-size:16px}
+  .brand h1{font-size:16px}
+  .tab{padding:6px 10px}
+  .toolbar{padding-bottom:9px;gap:6px}
+  .seg button,.btn{padding:6px 10px;font-size:12px}
+  /* Thu nhỏ chữ chú giải để 3 chip nằm gọn một dòng; vạch mẫu giữ nguyên kích thước */
+  .legend{gap:4px;font-size:10px}
+  .legend span{padding:4px 6px;gap:4px}
+}
+@media (max-width:345px){
+  .legend{gap:3px;font-size:9px}
+  .legend span{padding:3px 4px;gap:3px}
+}
 
 /* ===== Print ===== */
 @media print{
@@ -188,7 +213,7 @@ body.view-table .cards{display:none}
   .note{margin-top:6px;padding:5px 7px;font-size:8.5px;line-height:1.4}
   .pltitle{margin:0 0 1px;font-size:10px}
   .plsub{font-size:11.5px;margin-bottom:6px}
-  .legend{margin-bottom:6px;font-size:8.5px;gap:12px}
+  .legend{margin-bottom:6px;font-size:8.5px;gap:12px;position:static;padding:0;background:none}
   .legend span{background:none;border:0;padding:0;gap:5px}
   .lg{width:16px;height:2px}
   .lg.add{width:8px;height:8px}
@@ -212,7 +237,7 @@ body.view-table .cards{display:none}
     <div class="star">★</div>
     <div>
       <h1>Sơ đồ quy trình trình ký văn bản</h1>
-      <p>Phần mềm ĐHTN — Học viện Chính trị quốc gia</p>
+      <p>Phần mềm ĐHTN — Học viện Chính trị khu vực II</p>
     </div>
   </div>
   <div class="tabs" id="tabs"></div>
@@ -236,7 +261,7 @@ body.view-table .cards{display:none}
    để số thứ tự các bước gốc giữ nguyên. */
 
 const LUUTRU = {
-  role:'Văn thư – Lưu trữ', task:'Lưu trữ',
+  role:'Lưu trữ', task:'Lưu trữ',
   d:'Thực hiện theo Quy chế công tác văn thư và công tác lưu trữ của Học viện CTQG',
   c:'', shape:'end', add:1
 };
@@ -253,29 +278,29 @@ const PL = [
      d:'Soạn thảo văn bản theo quy định', c:'', shape:'start'},
     {role:'Cấp Phó đơn vị (phụ trách)', task:'Phê duyệt',
      d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản.',
-     c:'(Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến cấp Trưởng đơn vị, không đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
     {role:'Cấp Trưởng đơn vị', task:'Phê duyệt',
      d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản ký nháy',
-     c:'(Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến Văn phòng, không đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
     {role:'Văn phòng', task:'Kiểm soát',
      d:'Tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản.',
-     c:'(Nếu văn bản Đạt chuyển đến Giám đốc ký duyệt, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến Giám đốc ký duyệt, không đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
     {role:'Giám đốc', task:'Ký duyệt',
      d:'Giám đốc ký duyệt văn bản',
-     c:'(Nếu văn bản Đạt Giám đốc ký duyệt văn bản, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+     c:'(Nếu văn bản đạt Giám đốc ký duyệt văn bản, không đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
     {role:'Văn thư', task:VANTHU_TASK, d:VANTHU_DESC,
-     c:'(Nếu văn bản Đạt văn thư phát hành, không Đạt trả lại chuyên viên soạn thảo)', shape:'proc'},
+     c:'(Nếu văn bản đạt văn thư phát hành, không đạt trả lại chuyên viên soạn thảo)', shape:'proc'},
     LUUTRU
   ],
   deadline:'Tại Bước 2,3: Không quá ½  ngày làm việc, tại Bước 4,6 không quá 3 giờ làm việc. tại Bước 5 không quá 1 ngày làm việc',
   warn:'',
   explain:[
     'Chuyên viên soạn thảo trình ký văn bản.',
-    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại chuyên viên soạn thảo).',
-    'Cấp Trưởng đơn vị cho ý kiến, chuyển phê duyệt (Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại chuyên viên soạn thảo).',
-    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản Đạt chuyển đến Giám đốc ký duyệt, không Đạt trả lại chuyên viên soạn thảo).',
-    'Giám đốc ký duyệt. (Nếu văn bản Đạt ký duyệt, không Đạt trả lại chuyên viên soạn thảo).',
-    'Văn thư kiểm tra thể thức văn bản lần cuối trước khi ban hành (Nếu văn bản Đạt cấp số, đóng dấu, lưu văn bản, không Đạt trả lại chuyên viên soạn thảo).'
+    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản đạt chuyển đến cấp Trưởng đơn vị, không đạt trả lại chuyên viên soạn thảo).',
+    'Cấp Trưởng đơn vị cho ý kiến, chuyển phê duyệt (Nếu văn bản đạt chuyển đến Văn phòng, không đạt trả lại chuyên viên soạn thảo).',
+    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản đạt chuyển đến Giám đốc ký duyệt, không đạt trả lại chuyên viên soạn thảo).',
+    'Giám đốc ký duyệt. (Nếu văn bản đạt ký duyệt, không đạt trả lại chuyên viên soạn thảo).',
+    'Văn thư kiểm tra thể thức văn bản lần cuối trước khi ban hành (Nếu văn bản đạt cấp số, đóng dấu, lưu văn bản, không đạt trả lại chuyên viên soạn thảo).'
   ]
 },
 {
@@ -287,33 +312,33 @@ const PL = [
      d:'Soạn thảo văn bản theo quy định', c:'', shape:'start'},
     {role:'Cấp Phó đơn vị (phụ trách)', task:'Phê duyệt',
      d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản.',
-     c:'(Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến cấp Trưởng đơn vị, không đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
     {role:'Cấp Trưởng đơn vị', task:'Phê duyệt',
      d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản ký nháy',
-     c:'(Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến Văn phòng, không đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
     {role:'Văn phòng', task:'Kiểm soát',
      d:'Tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản.',
-     c:'(Nếu văn bản Đạt chuyển đến Giám đốc ký duyệt, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến Giám đốc ký duyệt, không đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
     {role:'Phó Giám đốc', task:'Phê duyệt',
      d:'Phó Giám đốc phê duyệt văn bản chuyển Giám đốc',
-     c:'(Nếu văn bản Đạt Phó Giám đốc  phê duyệt, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+     c:'(Nếu văn bản đạt Phó Giám đốc  phê duyệt, không đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
     {role:'Giám đốc', task:'Ký duyệt',
      d:'Giám đốc ký duyệt văn bản',
-     c:'(Nếu văn bản Đạt Giám đốc ký duyệt, không Đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
+     c:'(Nếu văn bản đạt Giám đốc ký duyệt, không đạt trả lại chuyên viên soạn thảo)', shape:'dia'},
     {role:'Văn thư Học viện', task:VANTHU_TASK, d:VANTHU_DESC,
-     c:'(Nếu văn bản Đạt văn thư phát hành, không Đạt trả lại chuyên viên soạn thảo)', shape:'proc'},
+     c:'(Nếu văn bản đạt văn thư phát hành, không đạt trả lại chuyên viên soạn thảo)', shape:'proc'},
     LUUTRU
   ],
   deadline:'Tại Bước 2,3,5: Không quá ½  ngày làm việc, tại Bước 4,6 không quá 3 giờ làm việc. tại Bước 5 không quá 1 ngày làm việc',
   warn:'Bản gốc ghi Bước 5 vừa “không quá ½ ngày làm việc” vừa “không quá 1 ngày làm việc”; Bước 7 (Văn thư Học viện) không được nêu thời hạn. Nội dung trên giữ nguyên văn — cần đối chiếu bản gốc có dấu khi áp dụng.',
   explain:[
     'Chuyên viên soạn thảo trình ký văn bản.',
-    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại).',
-    'Cấp Trưởng đơn vị cho ý kiến, chuyển phê duyệt (Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại chuyên viên soạn thảo).',
-    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản Đạt chuyển đến Phó Giám đốc phê duyệt, không Đạt trả lại).',
-    'Phó Giám đốc phê duyệt. (Nếu văn bản Đạt Phó Giám đốc phê duyệt, không Đạt trả lại).',
-    'Giám đốc ký duyệt. (Nếu văn bản Đạt ký duyệt, không Đạt trả lại).',
-    'Văn thư kiểm tra thể thức lần cuối trước khi ban hành (Nếu văn bản Đạt cấp số, đóng dấu, lưu văn bản, không Đạt trả lại).'
+    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản đạt chuyển đến cấp Trưởng đơn vị, không đạt trả lại).',
+    'Cấp Trưởng đơn vị cho ý kiến, chuyển phê duyệt (Nếu văn bản đạt chuyển đến Văn phòng, không đạt trả lại chuyên viên soạn thảo).',
+    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản đạt chuyển đến Phó Giám đốc phê duyệt, không đạt trả lại).',
+    'Phó Giám đốc phê duyệt. (Nếu văn bản đạt Phó Giám đốc phê duyệt, không đạt trả lại).',
+    'Giám đốc ký duyệt. (Nếu văn bản đạt ký duyệt, không đạt trả lại).',
+    'Văn thư kiểm tra thể thức lần cuối trước khi ban hành (Nếu văn bản đạt cấp số, đóng dấu, lưu văn bản, không đạt trả lại).'
   ]
 },
 {
@@ -325,29 +350,29 @@ const PL = [
      d:'Soạn thảo văn bản theo quy định', c:'', shape:'start'},
     {role:'Cấp Phó đơn vị (phụ trách)', task:'Phê duyệt',
      d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản.',
-     c:'(Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến cấp Trưởng đơn vị, không đạt trả lại', shape:'dia'},
     {role:'Cấp Trưởng đơn vị', task:'Phê duyệt',
      d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản ký nháy',
-     c:'(Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến Văn phòng, không đạt trả lại)', shape:'dia'},
     {role:'Văn phòng', task:'Kiểm soát',
      d:'Tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản.',
-     c:'(Nếu văn bản Đạt chuyển đến Phó Giám đốc ký duyệt, không Đạt trả lại)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến Phó Giám đốc ký duyệt, không đạt trả lại)', shape:'dia'},
     {role:'Phó Giám đốc', task:'Ký duyệt',
      d:'Phó Giám đốc ký duyệt văn bản',
-     c:'(Nếu văn bản Đạt Phó Giám đốc ký duyệt văn bản, không Đạt trả lại)', shape:'dia'},
+     c:'(Nếu văn bản đạt Phó Giám đốc ký duyệt văn bản, không đạt trả lại)', shape:'dia'},
     {role:'Văn thư', task:VANTHU_TASK, d:VANTHU_DESC,
-     c:'(Nếu văn bản Đạt văn thư phát hành, không Đạt trả lại)', shape:'proc'},
+     c:'(Nếu văn bản đạt văn thư phát hành, không đạt trả lại)', shape:'proc'},
     LUUTRU
   ],
   deadline:'Tại Bước 2,3: Không quá ½  ngày làm việc, tại Bước 4,6 không quá 3 giờ làm việc. tại Bước 5 không quá 1 ngày làm việc',
   warn:'Bản gốc thiếu dấu đóng ngoặc ở cuối ô Mô tả công việc của Bước 2 — giữ nguyên văn.',
   explain:[
     'Chuyên viên soạn thảo trình ký văn bản.',
-    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản Đạt chuyển đến cấp Trưởng đơn vị, không Đạt trả lại).',
-    'Cấp Trưởng đơn vị cho ý kiến, chuyển phê duyệt (Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại).',
-    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản Đạt chuyển đến Phó Giám đốc ký duyệt, không Đạt trả lại).',
-    'Phó Giám đốc ký duyệt. (Nếu văn bản Đạt ký duyệt, không Đạt trả lại).',
-    'Văn thư kiểm tra thể thức lần cuối trước khi ban hành (Nếu văn bản Đạt cấp số, đóng dấu, lưu văn bản, không Đạt trả lại).'
+    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản đạt chuyển đến cấp Trưởng đơn vị, không đạt trả lại).',
+    'Cấp Trưởng đơn vị cho ý kiến, chuyển phê duyệt (Nếu văn bản đạt chuyển đến Văn phòng, không đạt trả lại).',
+    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản đạt chuyển đến Phó Giám đốc ký duyệt, không đạt trả lại).',
+    'Phó Giám đốc ký duyệt. (Nếu văn bản đạt ký duyệt, không đạt trả lại).',
+    'Văn thư kiểm tra thể thức lần cuối trước khi ban hành (Nếu văn bản đạt cấp số, đóng dấu, lưu văn bản, không đạt trả lại).'
   ]
 },
 {
@@ -359,24 +384,24 @@ const PL = [
      d:'Soạn thảo văn bản theo quy định', c:'', shape:'start'},
     {role:'Cấp Phó đơn vị (phụ trách)', task:'Phê duyệt',
      d:'Duyệt nội dung và thể thức, kỹ thuật trình bày văn bản.',
-     c:'(Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến Văn phòng, không đạt trả lại)', shape:'dia'},
     {role:'Văn phòng', task:'Kiểm soát',
      d:'Tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản.',
-     c:'(Nếu văn bản Đạt chuyển đến Trưởng đơn vị ký duyệt, không Đạt trả lại)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến Trưởng đơn vị ký duyệt, không đạt trả lại)', shape:'dia'},
     {role:'Cấp Trưởng đơn vị', task:'Ký duyệt',
-     d:'Ký duyệt văn bản', c:'(Nếu văn bản Đạt ký duyệt, không Đạt trả lại)', shape:'dia'},
+     d:'Ký duyệt văn bản', c:'(Nếu văn bản đạt ký duyệt, không đạt trả lại)', shape:'dia'},
     {role:'Văn thư', task:VANTHU_TASK, d:VANTHU_DESC,
-     c:'(Nếu văn bản Đạt văn thư phát hành, không Đạt trả lại)', shape:'proc'},
+     c:'(Nếu văn bản đạt văn thư phát hành, không đạt trả lại)', shape:'proc'},
     LUUTRU
   ],
   deadline:'Tại Bước 2,3: Không quá ½  ngày làm việc, tại Bước 4 không quá 3 giờ làm việc. tại Bước 4 không quá 1 ngày làm việc',
   warn:'Bản gốc nêu Bước 4 hai lần với hai mốc khác nhau (“không quá 3 giờ làm việc” và “không quá 1 ngày làm việc”); Bước 5 (Văn thư) không được nêu thời hạn. Nội dung trên giữ nguyên văn — cần đối chiếu bản gốc có dấu khi áp dụng.',
   explain:[
     'Chuyên viên soạn thảo trình ký văn bản.',
-    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản Đạt chuyển đến Văn phòng, không Đạt trả lại chuyên viên soạn thảo nêu rõ lý do).',
-    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản Đạt chuyển đến (Ký thừa lệnh), không Đạt trả lại chuyên viên soạn thảo).',
-    'Trưởng đơn vị ký duyệt. (Nếu văn bản Đạt ký duyệt, không Đạt trả lại chuyên viên soạn thảo).',
-    'Văn thư kiểm tra thể thức văn bản lần cuối trước khi ban hành (Nếu văn bản Đạt cấp số, đóng dấu, lưu văn bản, không Đạt trả lại chuyên viên soạn thảo).'
+    'Cấp Phó đơn vị (phụ trách)  cho ý kiến, chuyển phê duyệt. (Nếu văn bản đạt chuyển đến Văn phòng, không đạt trả lại chuyên viên soạn thảo nêu rõ lý do).',
+    'Văn phòng kiểm soát, chuyển ký duyệt. (Nếu văn bản đạt chuyển đến (Ký thừa lệnh), không đạt trả lại chuyên viên soạn thảo).',
+    'Trưởng đơn vị ký duyệt. (Nếu văn bản đạt ký duyệt, không đạt trả lại chuyên viên soạn thảo).',
+    'Văn thư kiểm tra thể thức văn bản lần cuối trước khi ban hành (Nếu văn bản đạt cấp số, đóng dấu, lưu văn bản, không đạt trả lại chuyên viên soạn thảo).'
   ]
 }
 ];
@@ -397,10 +422,10 @@ function sheet(pl){
   pl.steps.forEach((st,i)=>{
     const last = i===n-1;
     const rowcls = (last?' r-1':'') + (st.add?' row-add':'');
-    // đường hồi "không Đạt trả lại": chạy từ các bước có điều kiện ngược về Bước 1
+    // đường hồi "không đạt trả lại": chạy từ các bước có điều kiện ngược về Bước 1
     let rail='';
     if(i===0) rail='<i class="railend"></i>';
-    else if(!last && st.c) rail='<i class="rail"></i>'+(i===1?'<span class="backlbl">không Đạt trả lại</span>':'');
+    else if(!last && st.c) rail='<i class="rail"></i>'+(i===1?'<span class="backlbl">không đạt trả lại</span>':'');
     else if(!last) rail='<i class="rail"></i>';
     h+='<div class="c stt'+rowcls+'">'+(i+1)+'</div>'
       +'<div class="c role'+rowcls+'">'+esc(st.role)+'</div>'
@@ -415,13 +440,13 @@ function sheet(pl){
 
 function cards(pl){
   const n=pl.steps.length;
-  // bước cuối cùng còn nhánh "không Đạt trả lại" — đường hồi chạy từ đây ngược về Bước 1
+  // bước cuối cùng còn nhánh "không đạt trả lại" — đường hồi chạy từ đây ngược về Bước 1
   let lastCond=-1;
   pl.steps.forEach((st,i)=>{ if(st.c) lastCond=i; });
   let h='<div class="cards">';
   pl.steps.forEach((st,i)=>{
     if(i===0) h+='<div class="crailzone"><i class="crail"></i>'
-      +'<span class="cbacklbl">không Đạt trả lại</span>';
+      +'<span class="cbacklbl-track"><span class="cbacklbl">không đạt trả lại</span></span>';
     h+='<div class="step'+(st.add?' added':'')+'">'
       +'<div class="shead"><div class="num">'+(i+1)+'</div>'
       +'<div class="stitle"><div class="task">'+esc(st.task)+'</div>'
@@ -442,7 +467,7 @@ function section(pl){
     +'<div class="plsub">'+esc(pl.sub)+'</div>'
     +'<div class="legend">'
       +'<span><i class="lg"></i>Luồng xử lý</span>'
-      +'<span><i class="lg back"></i>không Đạt trả lại</span>'
+      +'<span><i class="lg back"></i>không đạt trả lại</span>'
       +'<span><i class="lg add"></i>Bước bổ sung</span>'
     +'</div>'
     +'<div class="sheetwrap">'+sheet(pl)+'</div>' + cards(pl)
@@ -452,10 +477,20 @@ function section(pl){
       + pl.explain.map(x=>'<li>'+esc(x)+'</li>').join('')
     +'</ol>'
       +'<div class="note"><b>Bổ sung:</b> Bước '+pl.steps.length
-      +' — Văn thư – Lưu trữ thực hiện lưu trữ văn bản. Bước này được bổ sung so với bản gốc; '
+      +' (Lưu trữ) được bổ sung so với bản gốc; '
       +'các bước 1–'+(pl.steps.length-1)+' giữ nguyên số thứ tự và nguyên văn nội dung.</div>'
     +'</div>'
     +'</section>';
+}
+
+/* Header và dải chú giải đều dính khi cuộn, chiều cao lại đổi theo bề ngang màn hình
+   (chip chú giải có thể xuống nhiều dòng). Đo cả hai để nhãn dọc dừng ngay dưới chú
+   giải thay vì bị che mất chữ đầu. Truy vấn ngay trong hàm để gọi được sớm. */
+function measureChrome(){
+  const hd=document.querySelector('header.top');
+  if(hd) document.documentElement.style.setProperty('--hh',hd.offsetHeight+'px');
+  const lg=document.querySelector('.pl.active .legend');
+  if(lg&&lg.offsetHeight) document.documentElement.style.setProperty('--lh',lg.offsetHeight+'px');
 }
 
 const main=document.getElementById('main');
@@ -471,6 +506,7 @@ tabsEl.innerHTML = PL.map((p,i)=>'<button class="tab'+(i?'':' active')+'" data-i
 function showPL(id){
   document.querySelectorAll('.pl').forEach(s=>s.classList.toggle('active',s.id===id));
   tabsEl.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.id===id));
+  measureChrome();
 }
 tabsEl.addEventListener('click',e=>{
   const b=e.target.closest('.tab'); if(b) showPL(b.dataset.id);
@@ -486,6 +522,7 @@ let pinned=null;
 try{ const s=localStorage.getItem('sdtk-view'); if(s==='card'||s==='table') pinned=s; }catch(e){}
 
 function apply(){
+  measureChrome();
   const v = pinned || (window.innerWidth>=TABLE_MIN ? 'table' : 'card');
   document.body.classList.toggle('view-card',v==='card');
   document.body.classList.toggle('view-table',v==='table');
