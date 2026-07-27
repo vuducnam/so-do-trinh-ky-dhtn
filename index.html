@@ -267,9 +267,10 @@ body.view-table .cards{display:none}
 /* Nội dung 4 phụ lục chép nguyên văn từ file:
    "QUY TRÌNH TRÌNH KÝ VĂN BẢN TRÊN PHẦN MỀM ĐHTN.docx"
    Đã sửa lỗi chính tả và khoảng trắng của bản gốc ("Thu nhập" → "Thu thập",
-   "Quy trinh" → "Quy trình", "tại ại" → "tại"); mọi mốc thời hạn, tên bước,
-   trách nhiệm và điều kiện chuyển bước giữ đúng bản gốc. Chỗ bản gốc thiếu
-   hoặc chưa khớp được nêu ở ghi chú "Lưu ý" của phụ lục, không sửa vào bảng.
+   "Quy trinh" → "Quy trình", "tại ại" → "tại"); tên bước, trách nhiệm và điều
+   kiện chuyển bước giữ đúng bản gốc. Riêng thời hạn Phụ lục 3 được bổ sung
+   Bước 3 (bản gốc sót) theo chỉ đạo. Chỗ bản gốc chưa khớp được nêu ở ghi chú
+   "Lưu ý" của phụ lục, không sửa vào bảng.
    Bước Lưu trữ đã có trong bản gốc (Phụ lục 2 đánh số 8, Phụ lục 3 đánh số 7). */
 
 const LUUTRU_HS = {
@@ -384,8 +385,8 @@ const PL = [
     {role:'Văn thư', task:VANTHU_TASK, d:VANTHU_DESC, c:VANTHU_COND, shape:'round'},
     LUUTRU_TH
   ],
-  deadline:'Thời hạn xử lý tại Bước 2, 4, 6 không quá ½ ngày làm việc; tại Bước 5 không quá 1 ngày làm việc.',
-  warn:'Bản gốc không nêu thời hạn xử lý của Bước 3 (Cấp Trưởng đơn vị) — cần đối chiếu bản gốc khi áp dụng.',
+  deadline:'Thời hạn xử lý tại Bước 2, 3, 4, 6 không quá ½ ngày làm việc; tại Bước 5 không quá 1 ngày làm việc.',
+  warn:'',
   explain:[
     'Chuyên viên/người được giao nhiệm vụ thu thập thông tin và soạn thảo văn bản theo quy định.',
     'Cấp Phó đơn vị (phụ trách) duyệt nội dung và thể thức, kỹ thuật trình bày văn bản. Nếu văn bản đạt chuyển đến cấp Trưởng đơn vị, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa.',
