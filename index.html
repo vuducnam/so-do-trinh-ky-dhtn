@@ -267,10 +267,10 @@ body.view-table .cards{display:none}
 /* Nội dung 4 phụ lục chép nguyên văn từ file:
    "QUY TRÌNH TRÌNH KÝ VĂN BẢN TRÊN PHẦN MỀM ĐHTN.docx"
    Đã sửa lỗi chính tả và khoảng trắng của bản gốc ("Thu nhập" → "Thu thập",
-   "Quy trinh" → "Quy trình", "tại ại" → "tại"); tên bước, trách nhiệm và điều
-   kiện chuyển bước giữ đúng bản gốc. Riêng thời hạn Phụ lục 3 được bổ sung
-   Bước 3 (bản gốc sót) theo chỉ đạo. Chỗ bản gốc chưa khớp được nêu ở ghi chú
-   "Lưu ý" của phụ lục, không sửa vào bảng.
+   "Quy trinh" → "Quy trình", "tại ại" → "tại"); tên bước và trách nhiệm giữ
+   đúng bản gốc. Hai chỗ bản gốc sót/chưa khớp đã sửa theo chỉ đạo: thời hạn
+   Phụ lục 3 bổ sung Bước 3; điều kiện Bước 4 Phụ lục 2 đổi thành "chuyển đến
+   Phó Giám đốc phê duyệt" cho khớp bước kế tiếp.
    Bước Lưu trữ đã có trong bản gốc (Phụ lục 2 đánh số 8, Phụ lục 3 đánh số 7). */
 
 const LUUTRU_HS = {
@@ -339,7 +339,7 @@ const PL = [
      c:'(Nếu văn bản đạt chuyển đến Văn phòng, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa)', shape:'dia'},
     {role:'Văn phòng', task:'Kiểm soát',
      d:'Tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản.',
-     c:'(Nếu văn bản đạt chuyển đến Giám đốc ký duyệt, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa)', shape:'dia'},
+     c:'(Nếu văn bản đạt chuyển đến Phó Giám đốc phê duyệt, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa)', shape:'dia'},
     {role:'Phó Giám đốc', task:'Phê duyệt',
      d:'Phó Giám đốc phê duyệt chuyển Giám đốc ký duyệt',
      c:'(Nếu văn bản đạt Phó Giám đốc phê duyệt, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa)', shape:'dia'},
@@ -350,12 +350,12 @@ const PL = [
     LUUTRU_HS
   ],
   deadline:'Thời hạn xử lý tại Bước 2, 3, 4, 5, 7 không quá ½ ngày làm việc; tại Bước 6 không quá 2 ngày làm việc.',
-  warn:'Bản gốc ghi điều kiện của Bước 4 là “chuyển đến Giám đốc ký duyệt”, trong khi bước kế tiếp là Bước 5 – Phó Giám đốc phê duyệt. Nội dung trên giữ nguyên văn — cần đối chiếu bản gốc khi áp dụng.',
+  warn:'',
   explain:[
     'Chuyên viên/người được giao nhiệm vụ thu thập thông tin và soạn thảo văn bản theo quy định.',
     'Cấp Phó đơn vị (phụ trách) duyệt nội dung và thể thức, kỹ thuật trình bày văn bản. Nếu văn bản đạt chuyển đến cấp Trưởng đơn vị, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa.',
     'Cấp Trưởng đơn vị duyệt nội dung và thể thức, kỹ thuật trình bày văn bản, ký nháy. Nếu văn bản đạt chuyển đến Văn phòng, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa.',
-    'Văn phòng tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản. Nếu văn bản đạt chuyển đến Giám đốc ký duyệt, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa.',
+    'Văn phòng tiếp nhận hồ sơ trình, kiểm tra thành phần hồ sơ, thể thức và kỹ thuật trình bày văn bản. Nếu văn bản đạt chuyển đến Phó Giám đốc phê duyệt, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa.',
     'Phó Giám đốc phê duyệt chuyển Giám đốc ký duyệt. Nếu văn bản đạt Phó Giám đốc phê duyệt, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa.',
     'Giám đốc ký duyệt văn bản. Nếu văn bản đạt Giám đốc ký duyệt, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa.',
     'Văn thư kiểm tra lần cuối thể thức văn bản, cấp số, đóng dấu, phát hành và lưu văn bản theo Quy chế công tác văn thư và công tác lưu trữ của Học viện. Nếu văn bản đạt văn thư phát hành, không đạt trả lại chuyên viên soạn thảo yêu cầu sửa.',
